@@ -1,6 +1,16 @@
 #pragma once
 
-#include "utils/pch.h"
+#include "common/pch.h"
+#include <string>
+
+struct ConnectionInfo
+{
+    int fd = -1;
+    std::string ip;
+    int port = 0;
+
+    bool isValid() const { return fd > 0; }
+};
 
 class Listener
 {
@@ -15,7 +25,7 @@ public:
     Listener& operator=(Listener&&) = delete;
 
     bool initialize();
-    int acceptConnection();
+    ConnectionInfo acceptConnection();
 
     int getPort() const { return m_port; }
     int getFd() const { return m_socket_fd; }

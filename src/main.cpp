@@ -1,4 +1,5 @@
-#include "core/Server.h"
+#include "application/Server.h"
+#include "logger/Logger.h"
 
 int main()
 {

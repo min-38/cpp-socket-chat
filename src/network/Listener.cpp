@@ -1,7 +1,5 @@
 #include "network/Listener.h"
-
-#include "utils/Logger.h"
-
+#include "logger/Logger.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -17,7 +15,7 @@ int make_nonblocking(int fd)
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-Listener::Listener(int port) : m_port(port), m_socket_fd(-1){}
+Listener::Listener(int port) : m_port(port), m_socket_fd(-1) {}
 
 Listener::~Listener()
 {
@@ -56,11 +54,12 @@ bool Listener::initialize()
     return true;
 }
 
-int Listener::acceptConnection()
+ConnectionInfo Listener::acceptConnection()
 {
+    ConnectionInfo conn_info;
     struct sockaddr_in client_addr {};
     socklen_t len = sizeof(client_addr);
-    
+
     int client_fd = accept(m_socket_fd, (sockaddr*)&client_addr, &len);
     if (client_fd < 0)
     {
@@ -68,15 +67,20 @@ int Listener::acceptConnection()
         {
             Logger::error("accept failed");
         }
-        return -1; // 에러 또는 논블러킹 수락 완료
+        return conn_info; // 에러 또는 논블러킹 수락 완료 (fd = -1)
     }
-    
-    // 클라이언트 주소 정보 로깅 (옵션)
+
+    // ConnectionInfo 채우기
+    conn_info.fd = client_fd;
+
     char client_ip[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-    Logger::info("New client connected: " + std::string(client_ip) + ":" + std::to_string(ntohs(client_addr.sin_port)));
+    conn_info.ip = client_ip;
+    conn_info.port = ntohs(client_addr.sin_port);
 
-    return client_fd;
+    Logger::info("New client connected: " + conn_info.ip + ":" + std::to_string(conn_info.port));
+
+    return conn_info;
 }
 
 void Listener::close()

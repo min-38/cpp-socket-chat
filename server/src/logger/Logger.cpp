@@ -13,18 +13,20 @@ void Logger::error(const std::string& msg) { log(LogLevel::ERROR, msg); }
 
 void Logger::log(LogLevel level, const std::string& msg)
 {
+    // 현재 시간 구하기
     auto now = std::chrono::system_clock::now();
     auto t = std::chrono::system_clock::to_time_t(now);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
         now.time_since_epoch() % std::chrono::seconds(1)
     ).count();
 
+    // 문자열 format을 조합하여 저장할
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&t), "%Y-%m-%d %H:%M:%S")
         << "." << std::setw(3) << std::setfill('0') << ms;
     std::string timestamp = oss.str();
 
-    // 2. 로그 레벨 문자열 선택
+    // 로그 레벨 문자열 선택
     const char* level_str = nullptr;
     switch (level)
     {
@@ -33,7 +35,7 @@ void Logger::log(LogLevel level, const std::string& msg)
         case LogLevel::ERROR: level_str = "ERROR"; break;
     }
 
-    // 3. 최종 로그 메시지 조합
+    // 최종 로그 메시지 조합
     std::string line = "[" + timestamp + "] [" + level_str + "] " + msg;
 
     if (level == LogLevel::ERROR)

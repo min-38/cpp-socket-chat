@@ -13,8 +13,11 @@ ThreadPool::ThreadPool(size_t num_threads) : m_stop(false)
 ThreadPool::~ThreadPool()
 {
     m_stop = true;
+
+    // queue에 대기하고 있던 작업들 종료
     m_task_queue.notify_all();
 
+    // Thread 종료
     for (std::thread &worker : m_workers)
         if (worker.joinable())
             worker.join();

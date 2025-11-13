@@ -4,7 +4,7 @@
 #include <thread>
 #include <functional>
 #include <atomic>
-#include "ThreadSafeQueue.h" // 이전에 만든 스레드 안전 큐
+#include "../containers/SafeQueue.h" // 이전에 만든 스레드 안전 큐
 
 class ThreadPool {
 public:
@@ -20,6 +20,6 @@ private:
     void worker_thread();
 
     std::vector<std::thread> m_workers;
-    ThreadSafeQueue<std::function<void()>> m_task_queue;
+    SafeQueue<std::function<void()>> m_task_queue;
     std::atomic<bool> m_stop;
 };

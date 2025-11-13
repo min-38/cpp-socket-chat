@@ -5,7 +5,7 @@
 #include <condition_variable>
 
 template <typename T>
-class ThreadSafeQueue
+class SafeQueue
 {
 public:
     void push(T value)

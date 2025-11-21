@@ -1,12 +1,12 @@
 #include "common/pch.h"
-#include "ui/ChatClient.h"
+#include "ui/Lobby.h"
 
 int main()
 {
     try
     {
-        ChatClient client;
-        client.Run();
+        Lobby lobby;
+        lobby.Run();
     }
     catch (const std::exception& e)
     {

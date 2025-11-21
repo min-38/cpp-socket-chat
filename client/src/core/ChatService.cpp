@@ -34,8 +34,11 @@ void ChatService::ReceiveLoop()
         if (!m_network_client->Receive(packet))
             break;
 
-        // 매시지 패킷만 처리
-        if (packet.header.type == PacketType::MESSAGE_CHAT)
+        // 채팅 메시지, 입퇴장 알림, 시스템 메시지 처리
+        if (packet.header.type == PacketType::MESSAGE_CHAT ||
+            packet.header.type == PacketType::ROOM_USER_JOIN ||
+            packet.header.type == PacketType::ROOM_USER_EXIT ||
+            packet.header.type == PacketType::MESSAGE_SYSTEM)
         {
             Message message = PacketHandler::ParseMessagePacket(packet);
             if (m_message_callback)

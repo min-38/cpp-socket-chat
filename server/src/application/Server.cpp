@@ -101,3 +101,16 @@ void Server::broadcastPacket(const Packet& packet, int exclude_fd)
 {
     m_packet_sender->broadcast(packet, exclude_fd);
 }
+
+void Server::broadcastPacketForRoom(const Packet& packet, const std::string& roomCode, int exclude_fd)
+{
+    // 방 찾기
+    Room* room = m_room_manager.getRoom(roomCode);
+    if (!room) return; // 방이 없으면 종료
+
+    // 방에 있는 모든 클라이언트에게 전송
+    std::vector<int> clientFds = room->getClientFds();
+    for (int fd : clientFds)
+        if (fd != exclude_fd)
+            m_packet_sender->send(fd, packet);
+}

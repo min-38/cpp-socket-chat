@@ -12,8 +12,11 @@ add_executable(server
 
     # Domain Layer
     src/domain/client/ClientManager.cpp
+    src/domain/room/Room.cpp
+    src/domain/room/RoomManager.cpp
     src/domain/handler/MessageHandler.cpp
     src/domain/handler/NicknameHandler.cpp
+    src/domain/handler/RoomHandler.cpp
     src/domain/handler/PacketHandler.cpp
 
     # Network Layer

@@ -13,6 +13,8 @@ struct ClientInfo
     std::string nickname;
     bool isAuthenticated = false;
     std::vector<char> recvBuffer; // 수신 버퍼
+
+    std::string roomCode = ""; // 소속 채팅방
 };
 
 class ClientManager

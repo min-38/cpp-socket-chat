@@ -15,11 +15,13 @@ set(CORE_SOURCES
     src/core/Message.cpp
     src/core/ConnectionService.cpp
     src/core/ChatService.cpp
+    src/core/RoomService.cpp
 )
 
 set(UI_SOURCES
     src/ui/ChatClient.cpp
     src/ui/ConsoleUI.cpp
+    src/ui/Lobby.cpp
 )
 
 set(COMMON_SOURCES

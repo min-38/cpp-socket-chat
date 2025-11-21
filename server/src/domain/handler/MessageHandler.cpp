@@ -10,13 +10,21 @@ void MessageHandler::handle(Server& server, int client_fd, const Packet& packet,
     ClientInfo* sender_info = client_manager.getClient(client_fd);
     if (!sender_info || !sender_info->isAuthenticated) return;
 
+    // 방에 속해있는지 확인
+    if (sender_info->roomCode.empty())
+    {
+        Logger::warn("Client " + std::to_string(client_fd) + " tried to send message without being in a room.");
+        return;
+    }
+
     try
     {
-        // 메시지 파싱
+        // JSON 파싱
         nlohmann::json client_json = nlohmann::json::parse(std::string(packet.payload, packet.header.size));
 
-        // 브로드캐스트용 페이로드 생성
+        // payload 생성
         nlohmann::json payload;
+        payload["sender_fd"] = client_fd;
         payload["sender_ip"] = sender_info->ip;
         payload["sender_nickname"] = sender_info->nickname;
         payload["message"] = client_json["message"];
@@ -28,7 +36,7 @@ void MessageHandler::handle(Server& server, int client_fd, const Packet& packet,
         std::strftime(time_buffer, sizeof(time_buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&now_time));
         payload["timestamp"] = std::string(time_buffer);
 
-        Logger::info("Parsed message from client " + std::to_string(client_fd) + ": " + payload.dump());
+        Logger::info("Message from client " + std::to_string(client_fd) + " in room " + sender_info->roomCode + ": " + payload.dump());
 
         std::string json_string = payload.dump();
 
@@ -44,7 +52,8 @@ void MessageHandler::handle(Server& server, int client_fd, const Packet& packet,
         else
         {
             memcpy(broadcast_packet.payload, json_string.c_str(), json_string.length());
-            server.broadcastPacket(broadcast_packet, client_fd);
+            // 같은 방에 있는 사람들에게만 브로드캐스트 (자기 자신 제외)
+            server.broadcastPacketForRoom(broadcast_packet, sender_info->roomCode, client_fd);
         }
     }
     catch (const nlohmann::json::exception& e)
